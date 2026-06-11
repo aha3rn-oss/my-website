@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع السياحة في المملكة - مستجيب</title>
+    <style>
+        /* --- تنسيقات CSS الأساسية --- */
+        :root {
+            --primary-color: #1e5f38; /* اللون الأخضر السعودي */
+            --secondary-color: #f4f9f4;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            transition: background-color 0.5s ease;
+        }
+
+        /* وضع الخلفية البديل (المظلم) */
+        body.dark-mode {
+            background-color: #222;
+            color: #fff;
+            --secondary-color: #333;
+        }
+
+        /* --- الهيدر وشريط التنقل --- */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2rem;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #133d24;
+            padding: 10px;
+            flex-wrap: wrap; /* للسماح للروابط بالنزول لسطر جديد في الجوال */
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        nav a:hover {
+            background-color: #2ea861;
+        }
+
+        /* زر تغيير الخلفية بـ JavaScript */
+        .theme-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 8px 15px;
+            background-color: #fff;
+            color: var(--primary-color);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            z-index: 10;
+        }
+
+        .theme-btn:hover {
+            background-color: #ddd;
+        }
+
+        /* --- الأقسام الرئيسية --- */
+        .container {
+            max-width: 1200px;
+            margin: 10px auto;
+            padding: 15px;
+        }
+
+        section {
+            display: none; /* إخفاء الأقسام وتفعيلها عبر النقر */
+            padding: 25px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        /* إظهار القسم النشط فقط */
+        section.active {
+            display: block;
+        }
+
+        body.dark-mode section {
+            background: #2d2d2d;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        body.dark-mode h2 {
+            color: #4ade80;
+            border-bottom-color: #4ade80;
+        }
+
+        /* --- معرض الصور (Image Gallery) مع تأثيرات CSS --- */
+        .gallery {
+            display: grid;
+            /* استجابة تلقائية: يتغير حجم الأعمدة بناءً على مساحة الشاشة */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        /* تأثير التكبير عند تمرير الماوس */
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-item .caption {
+            position: absolute;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        /* --- صفحات المدن الفرعية --- */
+        .city-content {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap; /* يجعل الصورة تنزل لأسفل النص في شاشة الجوال */
+        }
+
+        .city-text {
+            flex: 1;
+            min-width: 280px;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+
+        .city-img {
+            max-width: 100%;
+            width: 450px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .city-img:hover {
+            transform: scale(1.02);
+        }
+
+        /* --- صفحة التواصل (النموذج) --- */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        input, textarea {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        form button {
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        form button:hover {
+            background-color: #133d24;
+        }
+
+        /* --- قواعد الاستجابة للشاشات الصغيرة (الجوال) --- */
+        @media (max-width: 600px) {
+            header {
+                padding: 60px 15px 20px 15px; /* مساحة إضافية للزر في الأعلى */
+            }
+            
+            header h1 {
+                font-size: 1.6rem;
+            }
+
+            nav {
+                flex-direction: column; /* تحويل الروابط لتصبح فوق بعضها في الجوال */
+                padding: 5px;
+            }
+
+            nav a {
+                margin: 2px 0;
+                padding: 12px; /* تكبير مساحة الضغط للإصبع */
+                background-color: rgba(255, 255, 255, 0.05);
+            }
+
+            .theme-btn {
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%); /* جعل الزر في المنتصف أعلى الهيدر بالجوال */
+            }
+
+            section {
+                padding: 15px;
+            }
+
+            .city-content {
+                flex-direction: column; /* الصورة تأتي تحت النص تماماً */
+                text-align: justify;
+            }
+
+            .city-img {
+                width: 100%; /* تأخذ الصورة كامل عرض شاشة الجوال */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <button class="theme-btn" onclick="toggleTheme()">تغيير الخلفية</button>
+        <h1>اكتشف سحر المملكة العربية السعودية</h1>
+        <p>موقعك الدليل لأجمل المعالم والمدن السياحية</p>
+    </header>
+
+    <nav>
+        <a href="javascript:void(0);" onclick="showPage('home')">الرئيسية</a>
+        <a href="javascript:void(0);" onclick="showPage('riyadh')">الرياض</a>
+        <a href="javascript:void(0);" onclick="showPage('makkah')">مكة المكرمة</a>
+        <a href="javascript:void(0);" onclick="showPage('madinah')">المدينة المنورة</a>
+        <a href="javascript:void(0);" onclick="showPage('jeddah')">جدة</a>
+        <a href="javascript:void(0);" onclick="showPage('contact')">صفحة التواصل</a>
+    </nav>
+
+    <div class="container">
+
+        <section id="home" class="active">
+            <h2>الرئيسية: مدن المملكة الساحرة</h2>
+            <p>مرحباً بكم في موقع السياحة بالمملكة. استكشف التنوع الثقافي، الجغرافي، والتاريخي لأجمل المدن السعودية.</p>
+            
+            <div class="gallery">
+                <div class="gallery-item">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTIdnQ-4weOoOP1Fe3IuOGHWuHSZLMRBlRow&s" alt="الرياض">
+                    <div class="caption">العاصمة الرياض</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://media-cdn.tripadvisor.com/media/photo-s/1c/8b/24/c0/caption.jpg" alt="مكة المكرمة">
+                    <div class="caption">مكة المكرمة</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://saudipedia.com/var/site/storage/images/2/8/1/2/4622182-1-ara-SA/a52109b6b41e-65486.jpg" alt="جدة">
+                    <div class="caption">عروس البحر الأحمر - جدة</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="riyadh">
+            <h2>الرياض - عاصمة المستقبل</h2>
+            <div class="city-content">
+                <div class="city-text">
+                    <p>الرياض هي عاصمة المملكة ووجهة سياحية تجمع بين عراقة التاريخ والتطور العمراني الهائل. تشتهر ببرج المملكة، الدرعية التاريخية، ومواسم الترفيه العالمية.</p>
+                </div>
+                <img class="city-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTIdnQ-4weOoOP1Fe3IuOGHWuHSZLMRBlRow&s" alt="برج المملكة بالرياض">
+            </div>
+        </section>
+
+        <section id="makkah">
+            <h2>مكة المكرمة - قبلة المسلمين</h2>
+            <div class="city-content">
+                <div class="city-text">
+                    <p>أقدس بقاع الأرض، وتضم المسجد الحرام والكعبة المشرفة. وفد إليها الملايين سنوياً لأداء مناسك الحج والعمرة، وتتميز بأجوائها الروحانية العظيمة.</p>
+                </div>
+                <img class="city-img" src="https://media-cdn.tripadvisor.com/media/photo-s/1c/8b/24/c0/caption.jpg" alt="المسجد الحرام">
+            </div>
+        </section>
+
+        <section id="madinah">
+            <h2>المدينة المنورة - طيبة الطيبة</h2>
+            <div class="city-content">
+                <div class="city-text">
+                    <p>مهاجر النبي صلى الله عليه وسلم، وتضم المسجد النبوي الشريف، ومسجد قباء، والعديد من المعالم والتفاصيل التاريخية الإسلامية التي تشرح الصدور.</p>
+                </div>
+                <img class="city-img" src="https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=500" alt="المسجد النبوي">
+            </div>
+        </section>
+
+        <section id="jeddah">
+            <h2>جدة - عروس البحر الأحمر</h2>
+            <div class="city-content">
+                <div class="city-text">
+                    <p>بواب الحرمين الشريفين ومدينة الفن والجمال. تتميز بـ "جدة التاريخية" (البلد) المدرجة ضمن التراث العالمي، ونافورة الملك فهد الشهيرة، والواجهة البحرية الرائعة.</p>
+                </div>
+                <img class="city-img" src="https://saudipedia.com/var/site/storage/images/2/8/1/2/4622182-1-ara-SA/a52109b6b41e-65486.jpg" alt="كورنيش جدة">
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2>صفحة التواصل (اقتراح أو استفسار)</h2>
+            <p>يسعدنا تلقي آرائكم واستفساراتكم حول السياحة في المملكة:</p>
+            <form onsubmit="event.preventDefault(); alert('شكراً لك! تم إرسال رسالتك بنجاح.');">
+                <input type="text" placeholder="الاسم الكامل" required>
+                <input type="email" placeholder="البريد الإلكتروني" required>
+                <textarea rows="5" placeholder="اكتب اقتراحك أو استفسارك هنا..." required></textarea>
+                <button type="submit">إرسال الرسالة</button>
+            </form>
+        </section>
+
+    </div>
+
+    <script>
+        function showPage(pageId) {
+            const sections = document.querySelectorAll('section');
+            sections.forEach(sec => sec.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            
+            // في حال الجوال: عند النقر على رابط، تصعد الشاشة للأعلى لرؤية المحتوى مباشرة
+            if (window.innerWidth <= 600) {
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+        }
+    </script>
+</body>
+</html>
